@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>Factorial - AssemblyScript</title>
+	<script type="module" src="./factorial.js"></script>
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/blaze/3.6.3/blaze.colors.min.css">
+	<link rel="stylesheet"
+		  href="https://cdnjs.cloudflare.com/ajax/libs/blaze/3.6.3/blaze.min.css"
+		  integrity="sha512-ibzt5j8KDCIygoUviW6jYKwOsA5PKYgzCXwgsTfKATSbpjcjRKpDlUQgNnHVpWS7o71QherXHiFuvqzXsXYQwA=="
+		  crossorigin="anonymous" />
+</head>
+<style>
+	.code-style {
+		font-size: 20px;
+		line-height: 28px;
+		background-color: lightblue;
+		color: #ffffff;
+	}
+	body {
+		font-family: 'Lato', sans-serif;
+		padding: 12px 12px 12px 12px;
+	}
+	.c-card__item--divider{
+		background-color: #2196f3;
+	}
+</style>
+<body>
+<div class="u-xlarge lato" style="margin-bottom: 12px;">AssemblyScript</div>
+<div class="c-card">
+	<div class="c-card__item c-card__item--divider">Instala assembly script con npm</div>
+	<div class="c-card__item">
+		<xmp>
+			npm i -g assemblyscript
+		</xmp>
+	</div>
+	<div class="c-card__item c-card__item--divider">Compila el archivo factorial.ts con la siguiente línea en una terminal</div>
+	<div class="c-card__item">
+		<xmp>
+			asc factorial.ts -b factorial.wasm
+		</xmp>
+	</div>
+	<div class="c-card__item c-card__item--divider">Guarda el siguiente código en el archivo factorial.ts</div>
+	<div class="c-card__item">
+		<xmp>
+			export function factorial(num: i32): i32 {
+				if (num === 0){
+					return 1;
+				} else {
+					return num * factorial( num - 1 );
+				}
+			}
+		</xmp>
+	</div>
+	<div class="c-card__item c-card__item--divider">Guarda el siguiente código en el archivo factorial.js</div>
+	<div class="c-card__item">
+		<xmp>
+			export const wasmInstantiate = async (wasmModuleUrl, importObject) => {
+
+				let response = undefined;
+
+				if (!importObject) {
+					importObject = {
+						env: {
+							abort: () => console.log("Error!")
+						}
+					};
+				}
+
+				const instantiateModule = async () => {
+					const response = await fetch("./factorial.wasm");
+					const buffer = await response.arrayBuffer();
+					const obj = await WebAssembly.instantiate(buffer, importObject);
+					return obj;
+				};
+
+				response = await instantiateModule();
+				return response;
+			};
+
+			const executeWasmFactorial = async () => {
+				const wasmModule = await wasmInstantiate("./factorial.wasm");
+				const factorialResult = wasmModule.instance.exports.factorial(7);
+				document.getElementById("factorialResultId").innerHTML = `El resultado es: <span class="c-text--highlight">${factorialResult}</span>`;
+			}
+
+			executeWasmFactorial();
+		</xmp>
+	</div>
+	<div class="c-card__item c-card__item--divider">Coloca el siguiente código en un archivo llamado index.html</div>
+	<div class="c-card__item">
+		<xmp>
+			<!DOCTYPE html>
+			<html>
+
+				<head>
+					<meta charset="UTF-8" />
+					<title>Factorial - AssemblyScript</title>
+					<script type="module" src="./factorial.js"></script>
+				</head>
+				<body>
+				<div id="factorialResultId"></div>
+				</body>
+			</html>
+		</xmp>
+
+	</div>
+	<div class="c-card__item c-card__item--divider">Monta un servidor y podrás ver lo siguiente</div>
+	<div class="c-card__item">
+		<div id="factorialResultId" class="c-paragraph"></div>
+	</div>
+</div>
+
+
+</body>
+</html>
